@@ -60,7 +60,7 @@ public class Session extends Thread {
             }
         }
 
-        manager.startGame(gameplay.getN());
+        manager.startGame(gameplay.getN(), ts);
         LocalTime start = LocalTime.now();
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         if (ts != 0) {

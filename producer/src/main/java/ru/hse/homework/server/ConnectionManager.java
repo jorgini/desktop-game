@@ -140,7 +140,7 @@ public class ConnectionManager extends Thread {
         return clients.size();
     }
 
-    public synchronized void startGame(int n) {
+    public synchronized void startGame(int n, int ts) {
         startGame = true;
 
         for (Socket client : clients) {
@@ -149,6 +149,7 @@ public class ConnectionManager extends Thread {
 
                 out.writeUTF(String.format("Start game session with id=%d", id));
                 out.writeInt(n);
+                out.writeInt(ts);
             } catch (IOException e) {
                 continue;
             }

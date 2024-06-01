@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.hse.server_gui.HelloController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+
+    <Label fx:id="welcomeText"/>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>port:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>m:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>tb:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>tp:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>ts:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>tn:</Text>
+        <TextField/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5.0">
+        <Text>n:</Text>
+        <TextField/>
+    </HBox>
+
+    <Button>Start server</Button>
+    <Button>Shutdown server</Button>
+</VBox>
