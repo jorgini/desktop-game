@@ -191,9 +191,11 @@ public class ConnectionManager extends Thread {
                 }
             }
 
-            if (startGame && tn != 0 && LocalTime.now().isBefore(prev.plusSeconds(tn))) {
-                sendGameProgress();
-                prev = LocalTime.now();
+            synchronized (this) {
+                if (startGame && tn != 0 && LocalTime.now().isAfter(prev.plusSeconds(tn))) {
+                    sendGameProgress();
+                    prev = LocalTime.now();
+                }
             }
 
             try {

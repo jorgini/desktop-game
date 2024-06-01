@@ -4,9 +4,9 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Server server = new ServerBuilder()
                 .setPort(3030)
-                .setM(1)
-                .setTb(3)
-                .setTn(3)
+                .setM(2)
+                .setTb(1)
+                .setTn(2)
                 .setTp(15)
                 .build();
 

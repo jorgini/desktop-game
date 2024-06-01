@@ -45,7 +45,7 @@ public class Gameplay {
             hiddenWord = wordsBase[gen.nextInt(wordsBase.length)];
         }
 
-        // System.out.println(hiddenWord);
+        System.out.println(hiddenWord);
         for (int i = 0; i < scores.size(); i++) {
             queue.add(i);
         }
