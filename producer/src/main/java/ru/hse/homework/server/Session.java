@@ -18,12 +18,9 @@ public class Session extends Thread {
 
     private final int ts;
 
-    private final int tn;
-
     public Session(int id, int tb, int ts, int tn) {
         this.tb = tb;
         this.ts = ts;
-        this.tn = tn;
         this.gameplay = new Gameplay();
         this.manager = new ConnectionManager(id, tn, gameplay);
 
@@ -51,9 +48,20 @@ public class Session extends Thread {
         gameplay.setN(n);
     }
 
+    public void setWordBase(String path) {
+        gameplay.setWordBase(path);
+    }
+
     @Override
     public void run() {
-        gameplay.start();
+        try {
+            gameplay.start();
+        } catch (RuntimeException e) {
+            // todo
+            System.out.println(e.getMessage());
+            manager.stopManager();
+            return;
+        }
 
         if (tb != 0) {
             try {

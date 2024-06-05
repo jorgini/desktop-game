@@ -1,5 +1,7 @@
 package ru.hse.homework.server;
 
+import ru.hse.homework.words.WordsReader;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -24,6 +26,8 @@ public class Server extends Thread {
 
     private String word = "";
 
+    private String pathWordBase = WordsReader.getResourceFilename();;
+
     private final ArrayList<Session> sessions;
 
     private ServerSocketChannel ss;
@@ -46,6 +50,10 @@ public class Server extends Thread {
     public synchronized void setWord(String word) {
         this.word = word;
         this.n = 0;
+    }
+
+    public synchronized void setPathWordBase(String pathWordBase) {
+        this.pathWordBase = pathWordBase;
     }
 
     @Override
@@ -88,6 +96,10 @@ public class Server extends Thread {
                 }
 
                 synchronized (this) {
+                    if (!pathWordBase.equals(WordsReader.getResourceFilename())) {
+                        cur_session.setWordBase(pathWordBase);
+                    }
+
                     if (n >= 5) {
                         cur_session.setLenWord(n);
                     } else if (!word.isEmpty()) {

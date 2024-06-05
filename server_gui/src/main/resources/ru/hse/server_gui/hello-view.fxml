@@ -63,6 +63,14 @@
         <Label fx:id="textWord" style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="7"
               visible="false">Word:</Label>
         <TextField fx:id="wordField" GridPane.columnIndex="1" GridPane.rowIndex="7" visible="false"/>
+
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="8">File with words base path:</Label>
+        <TextField fx:id="fileField" GridPane.columnIndex="1" GridPane.rowIndex="8" editable="false"/>
+
+        <HBox GridPane.columnIndex="1" GridPane.rowIndex="9" spacing="10">
+            <Button onMouseClicked="#chooseFile" prefWidth="85">Choose</Button>
+            <Button onMouseClicked="#setDefaultFile" prefWidth="85" style="-fx-background-color: gray">Default</Button>
+        </HBox>
     </GridPane>
 
     <VBox alignment="CENTER" spacing="10">

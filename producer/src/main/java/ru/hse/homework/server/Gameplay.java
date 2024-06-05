@@ -7,18 +7,21 @@ import java.util.*;
 public class Gameplay {
     private String hiddenWord = "";
 
+    private int n = 5;
+
+    private String wordsBase = "";
+
     private final ArrayList<ArrayList<Boolean>> guess = new ArrayList<>();
 
     private final ArrayList<Integer> scores = new ArrayList<>();
 
     private final Deque<Integer> queue = new ArrayDeque<>();
 
-    private int n = 5;
-
     private boolean isFinished = false;
 
     public void setN(int n) {
         this.n = n;
+        this.hiddenWord = "";
     }
 
     public int getN() { return this.n; }
@@ -27,6 +30,8 @@ public class Gameplay {
         this.hiddenWord = word;
         this.n = word.length();
     }
+
+    public void setWordBase(String path) { this.wordsBase = path; }
 
     public synchronized void addPlayer() {
         guess.add(new ArrayList<>());
@@ -45,11 +50,18 @@ public class Gameplay {
     public synchronized void start() {
         if (hiddenWord.isEmpty()) {
             Random gen = new Random();
-            String[] wordsBase = WordsReader.readWords(n);
-            if (wordsBase.length == 0) {
+            String[] words;
+
+            if (wordsBase.isEmpty()) {
+                words = WordsReader.readDefaultWords(n);
+            } else {
+                words = WordsReader.readWordsFromFile(wordsBase, n);
+            }
+
+            if (words.length == 0) {
                 throw new RuntimeException("no words with current length found");
             }
-            hiddenWord = wordsBase[gen.nextInt(wordsBase.length)];
+            hiddenWord = words[gen.nextInt(words.length)];
         }
 
         n = hiddenWord.length();

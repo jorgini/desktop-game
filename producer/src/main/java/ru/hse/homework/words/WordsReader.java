@@ -1,5 +1,7 @@
 package ru.hse.homework.words;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -23,11 +25,14 @@ public class WordsReader {
      */
     private static final String RESOURCE_FILENAME = "russian_nouns.txt";
 
+    public static String getResourceFilename() {
+        return RESOURCE_FILENAME;
+    }
     /**
      * The method to read a resource file with words into string array.
      * @return - string array of words from the resource file.
      */
-    public static String[] readWords(int n) {
+    public static String[] readDefaultWords(int n) {
         ArrayList<String> words = new ArrayList<>();
         InputStream inputStream = WordsReader.class.getClassLoader().getResourceAsStream(RESOURCE_FILENAME);
         if(inputStream != null) {
@@ -38,6 +43,29 @@ public class WordsReader {
                     if (word.length() == n) {
                         words.add(word);
                     }
+                }
+            }
+        }
+        return words.toArray(new String[0]);
+    }
+
+    public static String[] readWordsFromFile(String path, int n) {
+        ArrayList<String> words = new ArrayList<>();
+        InputStream inputStream;
+
+        try {
+            System.out.println(path);
+            inputStream = new FileInputStream(path);
+        } catch (FileNotFoundException e) {
+            return new String[0];
+        }
+
+        try (Scanner scanner = new Scanner(inputStream)) {
+            while (scanner.hasNextLine()) {
+                String fileLine = scanner.nextLine();
+                String word = fileLine.trim();
+                if (word.length() == n) {
+                    words.add(word);
                 }
             }
         }
