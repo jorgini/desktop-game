@@ -16,8 +16,6 @@ public class ConnectionManager extends Thread {
 
     private final Gameplay gameplay;
 
-    private Boolean startGame = false;
-
     private final int tn;
 
     private volatile Boolean stop = false;
@@ -100,7 +98,7 @@ public class ConnectionManager extends Thread {
                     out.writeUTF(s);
                 }
             } catch (IOException e) {
-                continue;
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -141,8 +139,6 @@ public class ConnectionManager extends Thread {
     }
 
     public synchronized void startGame(int n, int ts) {
-        startGame = true;
-
         for (Socket client : clients) {
             try {
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
@@ -189,10 +185,8 @@ public class ConnectionManager extends Thread {
                         eraseConn(i);
                     }
                 }
-            }
 
-            synchronized (this) {
-                if (startGame && tn != 0 && LocalTime.now().isAfter(prev.plusSeconds(tn))) {
+                if (tn != 0 && LocalTime.now().isAfter(prev.plusSeconds(tn))) {
                     sendGameProgress();
                     prev = LocalTime.now();
                 }

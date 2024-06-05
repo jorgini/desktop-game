@@ -1,49 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ru.hse.server_gui.HelloController">
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<?import java.net.URL?>
+<VBox alignment="CENTER" spacing="40.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.hse.server_gui.ConfigController" style="-fx-background-color: #262424">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <Label fx:id="welcomeText"/>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>port:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>m:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>tb:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>tp:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>ts:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>tn:</Text>
-        <TextField/>
-    </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="5.0">
-        <Text>n:</Text>
-        <TextField/>
-    </HBox>
+    <GridPane alignment="CENTER" vgap="10" hgap="50">
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            Launch on port:
+        </Label>
+        <TextField fx:id="portField" GridPane.columnIndex="1" GridPane.rowIndex="0" text="1234"/>
 
-    <Button>Start server</Button>
-    <Button>Shutdown server</Button>
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            Count of players in session (m):
+        </Label>
+        <TextField fx:id="mField" GridPane.columnIndex="1" GridPane.rowIndex="1" text="3"/>
+
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="3">
+            Players gathering time (tp):
+        </Label>
+        <TextField fx:id="tpField" GridPane.columnIndex="1" GridPane.rowIndex="3" text="30"/>
+
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            Session duration (ts):
+        </Label>
+        <TextField fx:id="tsField" GridPane.columnIndex="1" GridPane.rowIndex="4" text="300"/>
+
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            Pause to start session (tb):
+        </Label>
+        <TextField fx:id="tbField" GridPane.columnIndex="1" GridPane.rowIndex="2" text="5"/>
+
+        <Label style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="5">
+            Notification interval (tn):
+        </Label>
+        <TextField fx:id="tnFiled" GridPane.columnIndex="1" GridPane.rowIndex="5" text="1"/>
+
+        <ComboBox GridPane.columnIndex="0" GridPane.rowIndex="6" promptText="Choose word specification"
+            fx:id="selector" onAction="#selectWordSpecification">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Length of word" />
+                    <String fx:value="Current word" />
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <Button GridPane.columnIndex="1" GridPane.rowIndex="6" onMouseClicked="#confirmWordSpecification"
+                prefWidth="180">Confirm word specification</Button>
+
+        <Label style="-fx-text-fill: white" fx:id="textLength" GridPane.columnIndex="0" GridPane.rowIndex="7"
+              visible="false">Length (n):</Label>
+        <TextField fx:id="nField" GridPane.columnIndex="1" GridPane.rowIndex="7" visible="false" text="5"/>
+
+        <Label fx:id="textWord" style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="7"
+              visible="false">Word:</Label>
+        <TextField fx:id="wordField" GridPane.columnIndex="1" GridPane.rowIndex="7" visible="false"/>
+    </GridPane>
+
+    <VBox alignment="CENTER" spacing="10">
+        <Label style="-fx-text-fill: red" fx:id="warningLabel" visible="false">Server already start</Label>
+        <Button onMouseClicked="#launchServer" prefWidth="120" >
+            Start server</Button>
+        <Button onMouseClicked="#stopServer" prefWidth="120" style="-fx-background-color: #c81919">
+            Shutdown server</Button>
+    </VBox>
+
+    <Button onMouseClicked="#about" prefWidth="120" style="-fx-background-color: #049af1">About</Button>
+
+    <stylesheets>   <URL value="@styles.css" /> </stylesheets>
 </VBox>

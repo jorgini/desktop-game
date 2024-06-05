@@ -18,9 +18,12 @@ public class Session extends Thread {
 
     private final int ts;
 
+    private final int tn;
+
     public Session(int id, int tb, int ts, int tn) {
         this.tb = tb;
         this.ts = ts;
+        this.tn = tn;
         this.gameplay = new Gameplay();
         this.manager = new ConnectionManager(id, tn, gameplay);
 

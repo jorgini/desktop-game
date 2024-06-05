@@ -12,6 +12,7 @@
         <module>consumer</module>
         <module>producer</module>
         <module>client_gui</module>
+        <module>server_gui</module>
     </modules>
 
     <properties>

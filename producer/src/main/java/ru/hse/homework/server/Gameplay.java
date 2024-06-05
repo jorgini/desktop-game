@@ -1,16 +1,21 @@
 package ru.hse.homework.server;
 
 import ru.hse.homework.words.WordsReader;
+
 import java.util.*;
 
 public class Gameplay {
     private String hiddenWord = "";
+
+    private final ArrayList<ArrayList<Boolean>> guess = new ArrayList<>();
 
     private final ArrayList<Integer> scores = new ArrayList<>();
 
     private final Deque<Integer> queue = new ArrayDeque<>();
 
     private int n = 5;
+
+    private boolean isFinished = false;
 
     public void setN(int n) {
         this.n = n;
@@ -24,13 +29,15 @@ public class Gameplay {
     }
 
     public synchronized void addPlayer() {
+        guess.add(new ArrayList<>());
         scores.add(0);
     }
 
     public synchronized void erasePlayer(int i) {
+        guess.remove(i);
         scores.remove(i);
 
-        if (queue.getFirst() > i) {
+        if (!queue.isEmpty() && queue.getFirst() > i) {
             queue.addFirst(queue.removeLast());
         }
     }
@@ -45,9 +52,16 @@ public class Gameplay {
             hiddenWord = wordsBase[gen.nextInt(wordsBase.length)];
         }
 
+        n = hiddenWord.length();
         System.out.println(hiddenWord);
-        for (int i = 0; i < scores.size(); i++) {
+
+        for (int i = 0; i < guess.size(); i++) {
             queue.add(i);
+
+            ArrayList<Boolean> cur = guess.get(i);
+            for (int j = 0; j < n; j++) {
+                cur.add(false);
+            }
         }
     }
 
@@ -57,7 +71,7 @@ public class Gameplay {
         }
 
         int ord = queue.removeFirst();
-        while (ord >= scores.size()) {
+        while (ord >= guess.size()) {
             ord = queue.removeFirst();
         }
         queue.addLast(ord);
@@ -65,14 +79,18 @@ public class Gameplay {
     }
 
     public synchronized int doAttempt(String letter, int place, int player) {
-        if (isFinished()) {
+        if (isFinished) {
             return -1;
         }
 
-        if (hiddenWord.contains(letter)) {
+        if (hiddenWord.contains(letter) && !guess.get(player).get(place)) {
             if (hiddenWord.charAt(place) == letter.charAt(0)) {
-                hiddenWord = hiddenWord.substring(0, place) + '*' + hiddenWord.substring(place + 1);
-                scores.add(player, scores.get(player) + 1);
+                guess.get(player).set(place, true);
+                scores.set(player, scores.get(player) + 1);
+
+                if (scores.get(player) == n) {
+                    isFinished = true;
+                }
                 return 1;
             } else {
                 return 0;
@@ -85,12 +103,14 @@ public class Gameplay {
     public synchronized String[] getProgress(List<String> names) {
         StringBuilder result = new StringBuilder();
 
-        for (int i = 0; i < scores.size(); i++) {
+        for (int i = 0; i < guess.size(); i++) {
             if (names.size() <= i) {
                 break;
             }
 
-            result.append(names.get(i)).append(String.format(" - %d\n", scores.get(i)));
+            StringBuilder score = new StringBuilder();
+            guess.get(i).stream().map(f -> { if (f) return '+'; else return '*';}).forEach(score::append);
+            result.append(names.get(i)).append(String.format(" - %s\n", score));
         }
 
         return result.toString().split("\n");
@@ -104,6 +124,6 @@ public class Gameplay {
     }
 
     public synchronized boolean isFinished() {
-        return hiddenWord.equals("*".repeat(hiddenWord.length()));
+        return isFinished;
     }
 }
