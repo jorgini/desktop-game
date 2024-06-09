@@ -1,1 +1,7 @@
 .idea
+
+client/target
+
+producer/target
+
+server_gui/target

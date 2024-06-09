@@ -8,9 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="server_gui" />
         <module name="producer" />
-        <module name="client_gui" />
-        <module name="consumer" />
+        <module name="client" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="client2" target="21" />
+      <module name="consumer" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -3,9 +3,6 @@ package ru.hse.homework.server;
 import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalTime;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Session extends Thread {
     private final ConnectionManager manager;
@@ -73,32 +70,41 @@ public class Session extends Thread {
 
         manager.startGame(gameplay.getN(), ts);
         LocalTime start = LocalTime.now();
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        if (ts != 0) {
-            executorService.schedule(new Interrupter(Thread.currentThread()), ts, TimeUnit.SECONDS);
-        }
+//        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+//        if (ts != 0) {
+//            executorService.schedule(new Interrupter(Thread.currentThread()), ts, TimeUnit.SECONDS);
+//        }
 
-        while (!stop && (ts == 0 || LocalTime.now().isBefore(start.plusSeconds(ts)))) {
+        while (!stop && manager.getConnCount() != 0 && (ts == 0 || LocalTime.now().isBefore(start.plusSeconds(ts)))) {
             int player = gameplay.getNextPlayerStep();
 
             try {
                 manager.getAttempt(player);
             } catch (IOException e) {
+                System.out.println("Error occurred on waiting for attempt: " + e.getMessage());
                 continue;
             }
 
             if (gameplay.isFinished()) {
                 stop = true;
             }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                System.out.println("Interrupt: " + e.getMessage());
+            }
         }
 
         if (!gameplay.isFinished()) {
+            System.out.println("Time expired");
             manager.sendTimeExpired();
         } else {
+            System.out.println("Game over");
             manager.sendResult();
         }
 
         manager.stopManager();
-        executorService.close();
+        //executorService.close();
     }
 }

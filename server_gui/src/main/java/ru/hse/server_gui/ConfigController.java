@@ -84,28 +84,12 @@ public class ConfigController {
     }
 
     private void switchEditable(boolean editable) {
-        portField.setEditable(editable);
-        mField.setEditable(editable);
-        tsField.setEditable(editable);
-        tbField.setEditable(editable);
-        tnFiled.setEditable(editable);
-        tpField.setEditable(editable);
-
-        if (editable) {
-            portField.setStyle(null);
-            mField.setStyle(null);
-            tsField.setStyle(null);
-            tbField.setStyle(null);
-            tnFiled.setStyle(null);
-            tpField.setStyle(null);
-        } else {
-            portField.setStyle("-fx-background-color: gray");
-            mField.setStyle("-fx-background-color: gray");
-            tsField.setStyle("-fx-background-color: gray");
-            tbField.setStyle("-fx-background-color: gray");
-            tnFiled.setStyle("-fx-background-color: gray");
-            tpField.setStyle("-fx-background-color: gray");
-        }
+        portField.setDisable(!editable);
+        mField.setDisable(!editable);
+        tsField.setDisable(!editable);
+        tbField.setDisable(!editable);
+        tnFiled.setDisable(!editable);
+        tpField.setDisable(!editable);
     }
 
     private boolean checkInputs() {
@@ -223,7 +207,7 @@ public class ConfigController {
                 nField.setStyle("-fx-background-color: #e37272;");
             }
         } else if (selector.getSelectionModel().getSelectedItem().equals("Current word")) {
-            if (wordField.getText().length() >= 5) {
+            if (wordField.getText().trim().length() >= 5) {
                 System.out.println("ok");
                 wordField.setStyle(null);
                 if (server != null) {

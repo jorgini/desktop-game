@@ -16,6 +16,8 @@ public class ConnectionManager extends Thread {
 
     private final Gameplay gameplay;
 
+    private volatile boolean started = false;
+
     private final int tn;
 
     private volatile Boolean stop = false;
@@ -33,41 +35,43 @@ public class ConnectionManager extends Thread {
         String input = in.readUTF();
 
         synchronized (this) {
-            names.add(input);
-            clients.add(s);
-            gameplay.addPlayer();
+            if (!names.contains(input)) {
+                names.add(input);
+                clients.add(s);
+                gameplay.addPlayer();
 
-            try {
-                out.writeUTF(String.format("Successful connect to session id=%d", id));
-            } catch (IOException e) {
-                gameplay.erasePlayer(clients.size() - 1);
-                names.removeLast();
-                clients.removeLast().close();
+                try {
+                    out.writeUTF(String.format("Successful connect to session id=%d", id));
+                } catch (IOException e) {
+                    gameplay.erasePlayer(clients.size() - 1);
+                    names.removeLast();
+                    clients.removeLast().close();
 
-                return;
+                    throw e;
+                }
+
+                sendClientsList();
+            } else {
+                out.writeUTF("Connection dismiss");
+                throw new IOException("player with this name already connect");
             }
-
-            sendClientsList();
         }
     }
 
     public synchronized void eraseConn(int ind) {
-        if (clients.get(ind).isClosed()) {
-            clients.remove(ind);
-            names.remove(ind);
-            gameplay.erasePlayer(ind);
-
-            sendClientsList();
+        try {
+            clients.remove(ind).close();
+        } catch (IOException e) {
+            System.out.println("Connection erase: " + e.getMessage());
         }
+        names.remove(ind);
+        gameplay.erasePlayer(ind);
+
+        sendClientsList();
     }
 
     private synchronized void sendClientsList() {
         for (int i = 0; i < clients.size(); i++) {
-            if (clients.get(i).isClosed()) {
-                eraseConn(i);
-                break;
-            }
-
             try {
                 DataOutputStream cur_out = new DataOutputStream(clients.get(i).getOutputStream());
                 cur_out.writeUTF("List of players");
@@ -77,7 +81,7 @@ public class ConnectionManager extends Thread {
                     cur_out.writeUTF(name);
                 }
             } catch (IOException e) {
-                if (clients.get(i).isClosed()) {
+                if (!ping(clients.get(i))) {
                     eraseConn(i);
                     break;
                 }
@@ -98,31 +102,35 @@ public class ConnectionManager extends Thread {
                     out.writeUTF(s);
                 }
             } catch (IOException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Can't send game progress: " + e.getMessage());
             }
         }
     }
 
     public synchronized void sendTimeExpired() {
+        String word = gameplay.getHiddenWord();
         for (Socket client : clients) {
             try {
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
                 out.writeUTF("Time expired");
+                out.writeUTF(word);
             } catch (IOException e) {
-                continue;
+                System.out.println("Can't send time expired: " + e.getMessage());
             }
         }
     }
 
     public synchronized void sendResult() {
         int winner = gameplay.getWinner();
+        String word = gameplay.getHiddenWord();
 
         for (int i = 0; i < clients.size(); i++) {
             try {
                 DataOutputStream out = new DataOutputStream(clients.get(i).getOutputStream());
 
                 out.writeUTF("Game over");
+                out.writeUTF(word);
                 if (winner == i) {
                     out.writeUTF("You win");
                 } else {
@@ -139,6 +147,7 @@ public class ConnectionManager extends Thread {
     }
 
     public synchronized void startGame(int n, int ts) {
+        started = true;
         for (Socket client : clients) {
             try {
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
@@ -162,7 +171,15 @@ public class ConnectionManager extends Thread {
 
         out.writeUTF("Your attempt");
 
+        // hardcore
+        clients.get(ind).setSoTimeout(20000);
         String input = in.readUTF();
+        clients.get(ind).setSoTimeout(0);
+
+        if (input.equals("Miss")) {
+            throw new IOException("client miss attempt");
+        }
+
         int place = in.readInt();
 
         if (input.length() > 1 || input.charAt(0) == '*' || place >= gameplay.getN()) {
@@ -175,18 +192,34 @@ public class ConnectionManager extends Thread {
         out.writeInt(k);
     }
 
+    private synchronized boolean ping(Socket client) {
+        try {
+            DataOutputStream out = new DataOutputStream(client.getOutputStream());
+            DataInputStream in = new DataInputStream(client.getInputStream());
+
+            out.writeUTF("Ping");
+            client.setSoTimeout(1000);
+            String input = in.readUTF();
+            client.setSoTimeout(0);
+            return input.equals("Pong");
+        } catch (IOException  e) {
+            System.out.println("Dismiss on ping: " + e.getMessage());
+            return false;
+        }
+    }
+
     @Override
     public void run() {
         LocalTime prev = LocalTime.now();
         while (!stop) {
             synchronized (this) {
                 for (int i = 0; i < clients.size(); i++) {
-                    if (clients.get(i).isClosed()) {
+                    if (!ping(clients.get(i))) {
                         eraseConn(i);
                     }
                 }
 
-                if (tn != 0 && LocalTime.now().isAfter(prev.plusSeconds(tn))) {
+                if (started && tn != 0 && LocalTime.now().isAfter(prev.plusSeconds(tn))) {
                     sendGameProgress();
                     prev = LocalTime.now();
                 }
@@ -203,7 +236,8 @@ public class ConnectionManager extends Thread {
     public synchronized void stopManager() {
         stop = true;
         for (Socket client : clients) {
-            try {
+            try (DataOutputStream out = new DataOutputStream(client.getOutputStream())) {
+                out.writeUTF("Stop connection");
                 client.close();
             } catch (IOException e) {
                 System.out.println("Can't close connection");

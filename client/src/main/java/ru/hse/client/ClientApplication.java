@@ -1,4 +1,4 @@
-package ru.hse.server_gui;
+package ru.hse.client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,14 +8,14 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class ConfigApplication extends Application {
+public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ConfigApplication.class.getResource("config-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 600);
+        FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("conn-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 500);
         scene.setFill(Color.BLACK);
 
-        stage.setTitle("Server configuration");
+        stage.setTitle("WordGame");
         stage.setScene(scene);
         stage.show();
     }

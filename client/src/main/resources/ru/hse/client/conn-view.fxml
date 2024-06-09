@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import java.net.URL?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.hse.client.ConnController" style="-fx-background-color: #262424">
+  <padding>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+  </padding>
+
+  <Label fx:id="welcomeText">
+    Welcome to Word Game!
+  </Label>
+
+  <Label wrapText="true" textAlignment="CENTER">To connect to game session enter host and port, where server launched, and username.</Label>
+
+  <VBox alignment="CENTER" spacing="15">
+    <VBox maxWidth="300" spacing="5">
+      <Label>Host:</Label>
+      <TextField fx:id="hostField" promptText="localhost" focusTraversable="false" maxWidth="300"/>
+    </VBox>
+    <VBox maxWidth="300" spacing="5">
+      <Label>Port:</Label>
+      <TextField fx:id="portField" promptText="1234" focusTraversable="false" maxWidth="300"/>
+    </VBox>
+    <VBox maxWidth="300" spacing="5">
+      <Label>Username:</Label>
+      <TextField fx:id="usernameField" promptText="penis" focusTraversable="false" maxWidth="300"/>
+    </VBox>
+  </VBox>
+
+  <Label fx:id="warningLabel" visible="false">Incorrect inputs, see about</Label>
+
+  <VBox maxWidth="100" spacing="10">
+    <Button fx:id="game" focusTraversable="false" prefWidth="100" onMouseClicked="#startGame">Game</Button>
+    <Button fx:id="cancel" focusTraversable="false" prefWidth="100" visible="false">Cancel</Button>
+  </VBox>
+
+  <Button fx:id="about" focusTraversable="false" prefWidth="100" onMouseClicked="#showAbout">About</Button>
+
+  <stylesheets>   <URL value="@conn.css" /> </stylesheets>
+</VBox>

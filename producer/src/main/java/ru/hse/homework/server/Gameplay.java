@@ -135,6 +135,10 @@ public class Gameplay {
         return -1;
     }
 
+    public synchronized String getHiddenWord() {
+        return hiddenWord;
+    }
+
     public synchronized boolean isFinished() {
         return isFinished;
     }

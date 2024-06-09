@@ -1,0 +1,53 @@
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 16;
+}
+
+#playersInfo, #gameHistory, #mainArea {
+    -fx-border-color: white;
+}
+
+#playersInfo {
+    -fx-border-width: 0 1 0 0;
+}
+
+#mainArea {
+    -fx-border-width: 0 1 0 1;
+}
+
+#gameHistory {
+    -fx-border-width: 0 0 0 1;
+}
+
+#timerLayout, #lenInfo {
+    -fx-border-width: 1;
+    -fx-border-color: #3232d6;
+    -fx-border-radius: 5;
+}
+
+.button {
+    -fx-background-color: #3232d6;
+    -fx-text-fill: white;
+}
+
+.text-field {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#warningLabel {
+    -fx-text-fill: #e37272;
+    -fx-font-size: 20;
+}
+
+.scroll-pane {
+    -fx-background: #262424;
+    -fx-border-color: #262424;
+}
+
+.scroll-pane .scroll-bar {
+    -fx-background-color: #262424;
+}
+
+.scroll-pane .scroll-bar .scroll-bar-track-piece {
+    -fx-background-color: #262424;
+}

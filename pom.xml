@@ -9,9 +9,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>consumer</module>
         <module>producer</module>
-        <module>client_gui</module>
+        <module>client</module>
         <module>server_gui</module>
     </modules>
 
