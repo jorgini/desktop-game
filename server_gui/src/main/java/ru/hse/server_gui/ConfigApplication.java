@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * ConfigApplication is class to launch server configuration gui as a widget.
+ */
 public class ConfigApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {

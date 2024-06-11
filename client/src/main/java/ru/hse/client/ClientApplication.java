@@ -8,6 +8,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * ClientApplication is class that launches gui application for user interaction with game sessions.
+ */
 public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {

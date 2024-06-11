@@ -56,7 +56,7 @@
         <Button GridPane.columnIndex="1" GridPane.rowIndex="6" onMouseClicked="#confirmWordSpecification"
                 prefWidth="180">Confirm word specification</Button>
 
-        <Label style="-fx-text-fill: white" fx:id="textLength" GridPane.columnIndex="0" GridPane.rowIndex="7"
+        <Label fx:id="textLength" style="-fx-text-fill: white" GridPane.columnIndex="0" GridPane.rowIndex="7"
               visible="false">Length (n):</Label>
         <TextField fx:id="nField" GridPane.columnIndex="1" GridPane.rowIndex="7" visible="false" text="5"/>
 

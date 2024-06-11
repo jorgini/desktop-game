@@ -19,22 +19,44 @@ import javafx.stage.WindowEvent;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+/**
+ * ConnController is class that implementing connection widget. There user enter host, port and username. He can
+ * also see about information.
+ */
 public class ConnController {
+    /**
+     * Field to enter host where server is launched.
+     */
     @FXML
     public TextField hostField;
 
+    /**
+     * Field to enter port where server is launched.
+     */
     @FXML
     private TextField portField;
 
+    /**
+     * Field to enter username of player.
+     */
     @FXML
     private TextField usernameField;
 
+    /**
+     * Label with warning.
+     */
     @FXML
     private Label warningLabel;
 
+    /**
+     * Button that cancels connection to session.
+     */
     @FXML
     private Button cancel;
 
+    /**
+     * Initializes widget. Sets formatter for port filed.
+     */
     public void initialize() {
         Pattern pattern = Pattern.compile("[0-9]*");
         TextFormatter<String> textFormatter = new TextFormatter<>(change -> {
@@ -47,6 +69,10 @@ public class ConnController {
         portField.setTextFormatter(textFormatter);
     }
 
+    /**
+     * Validates input. Check port value and that host and username isn't empty.
+     * @return - true if inputs valid, false - otherwise.
+     */
     private boolean validateInput() {
         if (hostField.getText().trim().isEmpty() || usernameField.getText().trim().isEmpty()) {
             return false;
@@ -62,6 +88,10 @@ public class ConnController {
         return true;
     }
 
+    /**
+     * Changes view of filed. If inputs isn't valid, then show warning and paint the fields in red.
+     * @param valid - is inputs valid or not.
+     */
     private void switchValid(boolean valid) {
         if (valid) {
             hostField.setStyle(null);
@@ -76,29 +106,47 @@ public class ConnController {
         }
     }
 
+    /**
+     * Changes editable of fields.
+     * @param lock - true if fields shouldn't be editable and false - otherwise.
+     */
     private void switchLockFields(boolean lock) {
         hostField.setDisable(lock);
         portField.setDisable(lock);
         usernameField.setDisable(lock);
     }
 
+    /**
+     * Shows current window and cancel game if it stars.
+     */
     private void showWindow() {
         Stage window = (Stage) hostField.getScene().getWindow();
         window.show();
         cancelGame();
     }
 
+    /**
+     * Hides current window.
+     */
     public void hideWindow() {
         Stage window = (Stage) hostField.getScene().getWindow();
         window.hide();
     }
 
+    /**
+     * Changes editable of fields and hide cancel button.
+     */
     private void cancelGame() {
         switchLockFields(false);
         cancel.setVisible(false);
         cancel.setOnMouseClicked(null);
     }
 
+    /**
+     * Starts game searching. Initializes new game widget but, doesn't show it until game will be found.
+     * Sets events on close game window to return current window and cancel game if cancel button is pressed.
+     * @throws IOException - may throws by fxml.load().
+     */
     @FXML
     protected void startGame() throws IOException {
         boolean valid = validateInput();
@@ -144,6 +192,9 @@ public class ConnController {
         }
     }
 
+    /**
+     * Shows about window with information about the game.
+     */
     @FXML
     protected void showAbout() {
         Stage stage = new Stage();
@@ -164,10 +215,13 @@ public class ConnController {
                 
                 Rules of game:
                 Server make a word, that you and other players will guess. All player make attempts in turn to 
-                identify letter and place where it is in hidden word. Game continue until someone guess the whole word
-                ot game time is expired. If time expired no one wins.
+                identify letter and place where it is in hidden word. You will have 15 seconds to attempt. 
+                Game continue until someone guess the whole word or game time is expired. If time expired last player 
+                has last opportunity to guess the letter and place. After his attempt if no one guessed whole word then 
+                no one wins.
                 
-                You can track the timer and progress of other players.
+                You can track the timer and progress of other players. Also in right you can track your previous 
+                attempts.
                 Good luck and have fun!
                 
                 Created by Belikov Georgiy. 
@@ -182,7 +236,7 @@ public class ConnController {
         root.getChildren().addAll(info);
         root.setStyle("-fx-background-color: #262424");
 
-        Scene scene = new Scene(root, 750, 450);
+        Scene scene = new Scene(root, 750, 500);
         scene.setFill(Color.BLACK);
 
         stage.setScene(scene);

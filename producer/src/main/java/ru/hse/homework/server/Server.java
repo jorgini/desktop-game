@@ -9,29 +9,74 @@ import java.nio.channels.SocketChannel;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+/**
+ * Server is class implementation server that accepts connections and launch sessions.
+ */
 public class Server extends Thread {
+    /**
+     * Port on which server is launched.
+     */
     private final int port;
 
+    /**
+     * Max amount of players in single session.
+     */
     private final int m;
 
+    /**
+     * Time to start game after session has been assembled.
+     */
     private final int tb;
 
+    /**
+     * Time to assemble session.
+     */
     private final int tp;
 
+    /**
+     * Duration of game.
+     */
     private final int ts;
 
+    /**
+     * Interval after witch players will be notified of their success.
+     */
     private final int tn;
 
+    /**
+     * Length of hidden words for all sessions.
+     */
     private int n = 0;
 
+    /**
+     * Hidden word for all sessions.
+     */
     private String word = "";
 
+    /**
+     * File path to word base.
+     */
     private String pathWordBase = WordsReader.getResourceFilename();;
 
+    /**
+     * Array with all launched sessions.
+     */
     private final ArrayList<Session> sessions;
 
+    /**
+     * Server socket channel which accepts connections.
+     */
     private ServerSocketChannel ss;
 
+    /**
+     * Constructor for Server.
+     * @param port - port on which server is launched.
+     * @param m - max amount of players in single session.
+     * @param tb - time to start game after session has been assembled.
+     * @param tp - time to assemble session.
+     * @param ts - duration of game.
+     * @param tn - interval after witch players will be notified of their success.
+     */
     public Server(int port, int m, int tb, int tp, int ts, int tn) {
         this.sessions = new ArrayList<>();
         this.port = port;
@@ -42,20 +87,36 @@ public class Server extends Thread {
         this.tn = tn;
     }
 
+    /**
+     * Setter for length of hidden words. When called current hidden word is disabled.
+     * @param n - length of hidden word.
+     */
     public synchronized void setN(Integer n) {
         this.n = n;
         this.word = "";
     }
 
+    /**
+     * Setter for current hidden words. When called length of words is disabled.
+     * @param word - current hidden word.
+     */
     public synchronized void setWord(String word) {
         this.word = word;
         this.n = 0;
     }
 
+    /**
+     * Setter for file path to word base.
+     * @param pathWordBase - file path.
+     */
     public synchronized void setPathWordBase(String pathWordBase) {
         this.pathWordBase = pathWordBase;
     }
 
+    /**
+     * Run server. Start with initialize ServerSocketChannel and then accepts the connection,
+     * store them for sessions and launch sessions.
+     */
     @Override
     public void run() {
         try (ServerSocketChannel serverSocket = ServerSocketChannel.open()) {
@@ -114,6 +175,9 @@ public class Server extends Thread {
         }
     }
 
+    /**
+     * Shut down server. Closes ServerSocketChannel and stops all sessions.
+     */
     public void shutDown() {
         try {
             ss.close();

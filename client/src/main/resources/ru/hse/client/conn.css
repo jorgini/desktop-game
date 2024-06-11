@@ -10,6 +10,10 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
+.button:hover {
+    -fx-opacity: 0.7;
+}
+
 #game {
     -fx-background-color: #3232d6;
     -fx-text-fill: white;

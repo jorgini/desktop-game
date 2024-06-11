@@ -20,52 +20,106 @@ import ru.hse.homework.server.ServerBuilder;
 import java.io.File;
 import java.util.regex.Pattern;
 
+/**
+ * ConfigController is class to handle event on server configuration window.
+ */
 public class ConfigController {
+    /**
+     * RESOURCE_FILENAME - hardcore option for default file name with word base.
+     */
     private static final String RESOURCE_FILENAME = "russian_nouns.txt";
 
+    /**
+     * textLength - label says "Length of hidden word".
+     */
     @FXML
     private Label textLength;
 
+    /**
+     * textWord - label says "Current word".
+     */
     @FXML
     private Label textWord;
 
+    /**
+     * portField - input field for port option.
+     */
     @FXML
     private TextField portField;
 
+    /**
+     * mField - input field for m option.
+     */
     @FXML
     private TextField mField;
 
+    /**
+     * tpField - input field for tp option.
+     */
     @FXML
     private TextField tpField;
 
+    /**
+     * tsField - input field for ts option.
+     */
     @FXML
     private TextField tsField;
 
+    /**
+     * tbField - input field for tb option.
+     */
     @FXML
     private TextField tbField;
 
+    /**
+     * tnField - input field for tn option.
+     */
     @FXML
     private TextField tnFiled;
 
+    /**
+     * nField - input field for n option.
+     */
     @FXML
     private TextField nField;
 
+    /**
+     * wordField - input field for word option.
+     */
     @FXML
     private TextField wordField;
 
+    /**
+     * fileField - input field for file option.
+     */
     @FXML
     private TextField fileField;
 
+    /**
+     * selector - ComboBox for select type of word specification.
+     */
     @FXML
     private ComboBox<String> selector;
 
+    /**
+     * warningLabel - Label with warning.
+     */
     @FXML
     private Label warningLabel;
 
+    /**
+     * server - instance of Server class.
+     */
     private Server server;
 
+    /**
+     * isRunning - flag indicates that server is launched.
+     */
     private boolean isRunning = false;
 
+    /**
+     * Initialize widget. Sets formatters for fields.
+     */
     public void initialize() {
         Pattern pattern = Pattern.compile("[0-9]*");
         TextField[] fields = new TextField[]{portField, mField, tpField, tsField, tbField, tnFiled, nField};
@@ -80,9 +134,23 @@ public class ConfigController {
             field.setTextFormatter(textFormatter);
         }
 
+        Pattern wordPattern = Pattern.compile("[a-zа-яё]+");
+        TextFormatter<String> wordFormatter = new TextFormatter<>(change -> {
+            if (wordPattern.matcher(change.getControlNewText()).matches()) {
+                return change;
+            } else {
+                return null;
+            }
+        });
+        wordField.setTextFormatter(wordFormatter);
+
         setDefaultFile();
     }
 
+    /**
+     * Change editable of required fields after start/stop server.
+     * @param editable - can fields be edited or not.
+     */
     private void switchEditable(boolean editable) {
         portField.setDisable(!editable);
         mField.setDisable(!editable);
@@ -92,6 +160,10 @@ public class ConfigController {
         tpField.setDisable(!editable);
     }
 
+    /**
+     * Validates user inputs in fields.
+     * @return true - if inputs valid, false - otherwise.
+     */
     private boolean checkInputs() {
         try {
             int port = Integer.parseInt(portField.getText());
@@ -111,6 +183,9 @@ public class ConfigController {
         return true;
     }
 
+    /**
+     * Launches server. Event handler on mouse click on start button.
+     */
     @FXML
     protected void launchServer() {
         wordField.getScene().getWindow().setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -147,6 +222,9 @@ public class ConfigController {
         }
     }
 
+    /**
+     * Stops server. Event handler on mouse click on shutdown button.
+     */
     @FXML
     protected void stopServer() {
         if (isRunning) {
@@ -166,6 +244,9 @@ public class ConfigController {
         }
     }
 
+    /**
+     * Changes filed with word specification depends on selector.
+     */
     @FXML
     protected void selectWordSpecification() {
         if (selector.getSelectionModel().getSelectedItem().equals("Length of word")) {
@@ -181,6 +262,9 @@ public class ConfigController {
         }
     }
 
+    /**
+     * Confirms word specification for all subsequent sessions.
+     */
     @FXML
     protected void confirmWordSpecification() {
         if (server != null) {
@@ -219,6 +303,9 @@ public class ConfigController {
         }
     }
 
+    /**
+     * Show file chooser to choose file with word base.
+     */
     @FXML
     protected void chooseFile() {
         FileChooser chooser = new FileChooser();
@@ -230,11 +317,17 @@ public class ConfigController {
         }
     }
 
+    /**
+     * Sets default file with word base.
+     */
     @FXML
     protected void setDefaultFile() {
         fileField.setText(RESOURCE_FILENAME);
     }
 
+    /**
+     * Show about window with information about game and required fields for start.
+     */
     @FXML
     protected void about() {
         Stage stage = new Stage();

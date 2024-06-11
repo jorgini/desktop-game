@@ -1,15 +1,18 @@
 package ru.hse.client;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -25,59 +28,108 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * GameController is class that handle the actions during the session and interacting with user and server by Clint
+ * instance.
+ */
 public class GameController {
+    /**
+     * Widget with history of attempts.
+     */
     @FXML
     private VBox attemptsList;
 
+    /**
+     * Label with time for attempt.
+     */
     @FXML
     private Label timerAttempt;
 
+    /**
+     * Label with results of attempt.
+     */
     @FXML
-    private  Label resultAttempt;
+    private Label resultAttempt;
 
+    /**
+     * Label with warning message.
+     */
     @FXML
     private Label warningLabel;
 
+    /**
+     * Label with info about session id.
+     */
     @FXML
     private Label sessionInfo;
 
+    /**
+     * Label with guessed word.
+     */
     @FXML
     private Label guessedWord;
 
+    /**
+     * Button to submit attempt.
+     */
     @FXML
     private Button submitButton;
 
+    /**
+     * Widget with remaining duration of session.
+     */
     @FXML
     private VBox timerLayout;
 
+    /**
+     * Widget with info about len of hidden word.
+     */
     @FXML
     private VBox lenInfo;
 
+    /**
+     * Label with indication to make attempt.
+     */
     @FXML
     private Label attemptText;
 
+    /**
+     * Field for guessed letter.
+     */
     @FXML
     private TextField letterField;
 
+    /**
+     * Field for guessed place.
+     */
     @FXML
     private TextField placeField;
 
-    @FXML
-    private ObservableList<ColumnConstraints> columns;
-
+    /**
+     * Widget with list of players connected to session.
+     */
     @FXML
     private VBox playersList;
 
+    /**
+     * Instance of Client.
+     */
     private Client client;
 
-    private boolean canceled = false;
-
+    /**
+     * Length of hidden word.
+     */
     private int n;
 
-    private AnimationTimer timer;
-
+    /**
+     * Hash map with progress of each player, where progress representing as string like *+**+, where + is
+     * guessed letter and * - otherwise.
+     */
     private final Map<String, String> progress = new HashMap<>();
 
+    /**
+     * Initializes widget. Sets formatters for fields.
+     */
     public void initialize() {
         Pattern place = Pattern.compile("[0-9]*");
         Pattern letter = Pattern.compile("[a-zа-яё]?");
@@ -100,28 +152,43 @@ public class GameController {
         letterField.setTextFormatter(letterFormatter);
     }
 
+    /**
+     * Replaces the amount of second to string like "00:00".
+     * @param seconds - amount of seconds.
+     * @return string in time format like "00:00".
+     */
     private String formatTime(int seconds) {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
+    /**
+     * Creates new Client instance and lunched them.
+     * @param host - host on which server is launched.
+     * @param port - port on which server is launched.
+     * @param username - username of player.
+     */
     public void setClient(String host, int port, String username) {
         client = new Client(host, port, username, this);
 
         client.start();
     }
 
-    public boolean sessionFind(int session_id) {
-        if (canceled) return false;
-
-        Platform.runLater(() -> {
-            sessionInfo.setText("Connect to session with id: " + session_id);
-            System.out.println("sessionFind");
-            Stage stage = (Stage) submitButton.getScene().getWindow();
-            stage.show();
-        });
-        return true;
+    /**
+     * Shows current widget with session info.
+     * @param session_id - session id.
+     */
+    public void sessionFind(int session_id) {
+        sessionInfo.setText("Connect to session with id: " + session_id);
+        System.out.println("sessionFind");
+        Stage stage = (Stage) submitButton.getScene().getWindow();
+        stage.show();
     }
 
+    /**
+     * Shows that game is start. Shows Timer with duration of session and length of hidden word.
+     * @param n - length of word.
+     * @param ts - duration of session.
+     */
     public void startGame(int n, int ts) {
         this.n = n;
         if (ts == 0) {
@@ -159,39 +226,66 @@ public class GameController {
         printListPlayers(progress.keySet().stream().toList());
     }
 
+    /**
+     * Parses progress of players into informative label.
+     * @param hBox - widget where to add label.
+     * @param success - progress of current player.
+     */
     private void parseSuccess(HBox hBox, String success) {
         for (char c : success.toCharArray()) {
             Label letter = new Label("*");
             if (c == '*') {
                 letter.setStyle("-fx-font-weight: bold; -fx-text-fill: #e37272; -fx-font-size: 26");
-            } else {
+            } else if (c == '+') {
                 letter.setStyle("-fx-font-weight: bold; -fx-text-fill: #80dd00; -fx-font-size: 26");
+            } else {
+                letter.setText(c + "");
+                letter.setStyle("-fx-font-weight: bold; -fx-text-fill: #80dd00; -fx-font-size: 20");
             }
             hBox.getChildren().add(letter);
         }
     }
 
+    /**
+     * Prints list of players with their progress if game already start, otherwise - only usernames.
+     * @param players
+     */
     public void printListPlayers(List<String> players) {
         playersList.getChildren().clear();
         for (String player : players) {
-            HBox hBox = new HBox();
+            GridPane grid = new GridPane();
             Label name = new Label(player);
             HBox inner = new HBox();
-            hBox.setStyle("-fx-border-width: 1; -fx-border-color: #3232d6; -fx-border-radius: 5;");
-            hBox.getChildren().addAll(name, inner);
-            hBox.setSpacing(20.0);
-            hBox.setPadding(new Insets(5, 5, 5, 5));
+            grid.setStyle("-fx-border-width: 1; -fx-border-color: #3232d6; -fx-border-radius: 5;");
+            grid.setHgap(10.0);
+            grid.setPadding(new Insets(5, 10, 5, 10));
+            ColumnConstraints[] columns= new ColumnConstraints[]{new ColumnConstraints(), new ColumnConstraints()};
+            columns[0].setPercentWidth(50.0);
+            columns[0].setHalignment(HPos.CENTER);
+            columns[1].setPercentWidth(50.0);
+            columns[1].setHalignment(HPos.CENTER);
+            grid.getColumnConstraints().addAll(columns);
+            grid.add(name, 0, 0);
+            grid.add(inner, 1, 0);
+
+            if (player.equals(client.getUserName())) {
+                progress.put(player, guessedWord.getText());
+            }
 
             if (progress.containsKey(player)) {
                 parseSuccess(inner, progress.get(player));
             } else {
-                parseSuccess(hBox, "*".repeat(n));
+                parseSuccess(inner, "*".repeat(n));
                 progress.put(player, "*".repeat(n));
             }
-            playersList.getChildren().add(hBox);
+            playersList.getChildren().add(grid);
         }
     }
 
+    /**
+     * Updates game progress and prints list of players.
+     * @param progress
+     */
     public void printGameProgress(List<String> progress) {
         List<String> names = new ArrayList<>();
         for (String info : progress) {
@@ -205,25 +299,32 @@ public class GameController {
         printListPlayers(names);
     }
 
+    /**
+     * Shows the indication to make attempt and fields to do it. Also starts timer for current attempt.
+     */
     public void doAttempt() {
         attemptText.setVisible(true);
         letterField.setDisable(false);
+        letterField.setText("");
         placeField.setDisable(false);
+        placeField.setText("");
         submitButton.setDisable(false);
         timerAttempt.setVisible(true);
         resultAttempt.setVisible(false);
 
-        this.timer = new AnimationTimer() {
+        AnimationTimer timer = new AnimationTimer() {
             final LocalTime begin = LocalTime.now();
 
             @Override
             public void handle(long l) {
                 int diff = (int) Duration.between(begin, LocalTime.now()).toSeconds();
 
-                if (diff >= 0 && diff <= 15) {
+                if (diff >= 0 && diff <= 15 && timerAttempt.isVisible()) {
                     timerAttempt.setText("Time to attempt - " + formatTime(15 - diff));
-                } else if (diff > 15) {
-                    expiredAttempt();
+                } else {
+                    if (diff > 15) {
+                        expiredAttempt();
+                    }
                     this.stop();
                 }
             }
@@ -232,6 +333,9 @@ public class GameController {
         timer.start();
     }
 
+    /**
+     * Hides the indication to make attempt and fields to do it.
+     */
     private void closeAttempt() {
         attemptText.setVisible(false);
         letterField.setDisable(true);
@@ -245,11 +349,12 @@ public class GameController {
         timerAttempt.setText("");
     }
 
+    /**
+     * Handlers submitting attempt. Validate inputs and then send it to Client.
+     */
     @FXML
     protected void submitAttempt() {
-        if (parseAttempt()) {
-            this.timer.stop();
-
+        if (validateAttempt()) {
             synchronized (client) {
                 client.setAttempt(letterField.getText(), Integer.parseInt(placeField.getText()));
                 client.notify();
@@ -264,6 +369,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Sends to client that player misses attempt.
+     */
     protected void expiredAttempt() {
         synchronized (client) {
             client.setMissAttempt();
@@ -275,7 +383,11 @@ public class GameController {
         resultAttempt.setVisible(false);
     }
 
-    private boolean parseAttempt() {
+    /**
+     * Validates inputs on attempt.
+     * @return - true if inputs valid and false - otherwise.
+     */
+    private boolean validateAttempt() {
         try {
             int place = Integer.parseInt(placeField.getText());
             String letter = letterField.getText();
@@ -289,12 +401,16 @@ public class GameController {
         return true;
     }
 
+    /**
+     * Shows result of attempt received form server and call add in history.
+     * @param k - response from server.
+     */
     public void showResultAttempt(int k) {
         resultAttempt.setVisible(true);
         if (k == -1) {
             resultAttempt.setText("Wrong attempt");
         } else if (k == 0) {
-            resultAttempt.setText("Wrong place, but letter exist in word");
+            resultAttempt.setText("Wrong place, but letter exist");
         } else if (k == 1) {
             resultAttempt.setText("You right");
             String prev = guessedWord.getText();
@@ -308,29 +424,51 @@ public class GameController {
         addAttemptInHistory(letterField.getText(), Integer.parseInt(placeField.getText()), resultAttempt.getText());
     }
 
+    /**
+     * Shows the modal with message that time of session is expired and hidden word, received form server.
+     * @param word - hidden word.
+     */
     public void printTimeExpired(String word) {
-        Label title = new Label("Time expired!");
-        showModal(title, word);
+        showModal("Time expired!",
+                String.format("Hidden word - %s . \nClose window to reconnect to new session.", word));
     }
 
+    /**
+     * Shows the modal with message that game is over and result (win/lose) and hidden word, received form server.
+     * @param result - true if player win, false - otherwise.
+     * @param word - hidden word.
+     */
     public void printGameOver(boolean result, String word) {
-        Label title = new Label();
+        String title;
         if (result) {
-            title.setText("You win!");
+            title = "You win!";
         } else {
-            title.setText("You lost!");
+            title = "You lost!";
         }
-        showModal(title, word);
-
+        showModal(title, String.format("Hidden word - %s . \nClose window to reconnect to new session.", word));
     }
 
-    private void showModal(Label title, String hiddenWord) {
+    /**
+     * Show the modal with message about exception on Client.
+     * @param message - exception message.
+     */
+    public void printException(String message) {
+        showModal("Something went wrong!", String.format("Error - %s", message));
+    }
+
+    /**
+     * Create and show the modal with required title and message.
+     * @param title - title of the modal.
+     * @param message - message in the modal.
+     */
+    private void showModal(String title, String message) {
         Stage stage = new Stage();
         VBox vBox = new VBox();
-        title.setStyle("-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: white;");
-        Label message = new Label(String.format("Hidden word - %s . \nClose window to reconnect to new session.", hiddenWord));
-        message.setStyle("-fx-text-fill: white; -fx-font-size: 18");
-        vBox.getChildren().addAll(title, message);
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 24; -fx-text-fill: white;");
+        Label messageLabel = new Label(String.format(message));
+        messageLabel.setStyle("-fx-text-fill: white; -fx-font-size: 18");
+        vBox.getChildren().addAll(titleLabel, messageLabel);
         vBox.setAlignment(Pos.TOP_CENTER);
         vBox.setSpacing(20);
         vBox.setStyle("-fx-background-color: #575656;");
@@ -353,8 +491,14 @@ public class GameController {
         });
     }
 
+    /**
+     * Adds attempt in widget with history of attempts.
+     * @param letter - guessed letter.
+     * @param place - guessed place.
+     * @param result - response from server.
+     */
     private void addAttemptInHistory(String letter, int place, String result) {
-        HBox hBox = new HBox();
+        GridPane grid = new GridPane();
         Label let = new Label(letter);
         let.setStyle("-fx-font-weight: bold; -fx-font-size: 20; -fx-text-fill: white;");
         Label pla = new Label(String.valueOf(place));
@@ -362,21 +506,33 @@ public class GameController {
         Label res = new Label(result);
         res.setStyle("-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: white;");
         if (result.contains("You right")) {
-            hBox.setStyle("-fx-border-width: 1; -fx-border-color: #80dd00; -fx-border-radius: 5;");
-        } else if (result.contains("Wrong place, but letter exist in word")) {
-            hBox.setStyle("-fx-border-width: 1; -fx-border-color: #ffffff; -fx-border-radius: 5;");
+            grid.setStyle("-fx-border-width: 1; -fx-border-color: #80dd00; -fx-border-radius: 5;");
+        } else if (result.contains("Wrong place, but letter exist")) {
+            grid.setStyle("-fx-border-width: 1; -fx-border-color: #ffffff; -fx-border-radius: 5;");
         } else if (result.contains("Wrong attempt")) {
-            hBox.setStyle("-fx-border-width: 1; -fx-border-color: #e37272; -fx-border-radius: 5;");
+            grid.setStyle("-fx-border-width: 1; -fx-border-color: #e37272; -fx-border-radius: 5;");
         }
-        hBox.getChildren().addAll(let, pla, res);
-        hBox.setSpacing(20.0);
-        hBox.setPadding(new Insets(5, 5, 5, 5));
+        grid.setHgap(10.0);
+        ColumnConstraints[] column = new ColumnConstraints[]{new ColumnConstraints(), new ColumnConstraints(), new ColumnConstraints()};
+        column[0].setHalignment(HPos.CENTER);
+        column[1].setHalignment(HPos.CENTER);
+        column[2].setHalignment(HPos.CENTER);
+        column[0].setPercentWidth(10.0);
+        column[1].setPercentWidth(10.0);
+        column[2].setPercentWidth(80.0);
+        grid.getColumnConstraints().addAll(column);
+        grid.setPadding(new Insets(5, 10, 5, 10));
+        grid.add(let, 0, 0);
+        grid.add(pla, 1, 0);
+        grid.add(res, 2, 0);
 
-        attemptsList.getChildren().add(hBox);
+        attemptsList.getChildren().add(grid);
     }
 
+    /**
+     * Cancels the game and close current window.
+     */
     public void cancel() {
-        canceled = true;
         Stage stage = (Stage) submitButton.getScene().getWindow();
         stage.close();
         client.stopGame();

@@ -7,27 +7,62 @@ import java.net.Socket;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+/**
+ * Connection manager is implementation of manager, that stores connection, check their keep alive and send messages.
+ */
 public class ConnectionManager extends Thread {
+    /**
+     * Identifier of the session the manager belongs to
+     */
     private final Integer id;
 
+    /**
+     * Array of sockets.
+     */
     private final ArrayList<Socket> clients = new ArrayList<>();
 
+    /**
+     * Array of usernames.
+     */
     private final ArrayList<String> names = new ArrayList<>();
 
+    /**
+     * Instance of gameplay with which session is launched.
+     */
     private final Gameplay gameplay;
 
+    /**
+     * Flag indicates that game is start.
+     */
     private volatile boolean started = false;
 
+    /**
+     * Interval after witch players will be notified of their success.
+     */
     private final int tn;
 
+    /**
+     * Flag that indicates end of session.
+     */
     private volatile Boolean stop = false;
 
+    /**
+     * Constructor for ConnectionManager
+     * @param id - identifier of session.
+     * @param tn - interval after witch players will be notified of their success.
+     * @param gameplay - instance of gameplay with which session is launched.
+     */
     public ConnectionManager(int id, int tn, Gameplay gameplay) {
         this.id = id;
         this.tn = tn;
         this.gameplay = gameplay;
     }
 
+    /**
+     * Method to add new connection to session. Checks for unique username.
+     * @param s - socket with new connection.
+     * @throws IOException - if connections failed or players with this username already exist in current session.
+     */
     public void addConn(Socket s) throws IOException {
         DataInputStream in = new DataInputStream(s.getInputStream());
         DataOutputStream out = new DataOutputStream(s.getOutputStream());
@@ -58,6 +93,10 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method to erase some connection. Closes it and send new clients list to players.
+     * @param ind - index of client that needs to erase.
+     */
     public synchronized void eraseConn(int ind) {
         try {
             clients.remove(ind).close();
@@ -70,6 +109,10 @@ public class ConnectionManager extends Thread {
         sendClientsList();
     }
 
+    /**
+     * Method to send list of clients to all players. If some connection closed, call erase and recurse send actual
+     * list again.
+     */
     private synchronized void sendClientsList() {
         for (int i = 0; i < clients.size(); i++) {
             try {
@@ -89,6 +132,9 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method to send progress of game to players. Get progress form Gameplay instance.
+     */
     private synchronized void sendGameProgress() {
         String[] scores = gameplay.getProgress(names);
 
@@ -107,6 +153,9 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method to send that time is expired and hidden word to players.
+     */
     public synchronized void sendTimeExpired() {
         String word = gameplay.getHiddenWord();
         for (Socket client : clients) {
@@ -121,6 +170,9 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method to send result of game. Get winner and hidden word from gameplay.
+     */
     public synchronized void sendResult() {
         int winner = gameplay.getWinner();
         String word = gameplay.getHiddenWord();
@@ -142,10 +194,19 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Getter for count of connection.
+     * @return count of keep alive connections.
+     */
     public synchronized int getConnCount() {
         return clients.size();
     }
 
+    /**
+     * Method that send clients message that game is start.
+     * @param n - length of hidden word.
+     * @param ts - duration of session.
+     */
     public synchronized void startGame(int n, int ts) {
         started = true;
         for (Socket client : clients) {
@@ -161,9 +222,15 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method that request attempt from current player. If attempt doesn't come for 20 seconds,
+     * socket closes and attempt miss.
+     * @param ind index of player, that should do attempt.
+     * @throws IOException if connection missed or incorrect index of client.
+     */
     public synchronized void getAttempt(int ind) throws IOException {
         if (ind >= clients.size() || ind < 0) {
-            throw new IOException();
+            throw new IOException("Incorrect index of client");
         }
 
         DataOutputStream out = new DataOutputStream(clients.get(ind).getOutputStream());
@@ -192,6 +259,11 @@ public class ConnectionManager extends Thread {
         out.writeInt(k);
     }
 
+    /**
+     * Method to ping the current connection.
+     * @param client socket to ping.
+     * @return true - if connection is keep alive and false - otherwise.
+     */
     private synchronized boolean ping(Socket client) {
         try {
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
@@ -208,6 +280,9 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Run ConnectionManager. Checks in timeout keep alive of connections and send game progress if it is necessary.
+     */
     @Override
     public void run() {
         LocalTime prev = LocalTime.now();
@@ -233,6 +308,9 @@ public class ConnectionManager extends Thread {
         }
     }
 
+    /**
+     * Method to stop the connection manager and close all sockets with exit message.
+     */
     public synchronized void stopManager() {
         stop = true;
         for (Socket client : clients) {

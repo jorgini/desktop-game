@@ -30,6 +30,7 @@ public class WordsReader {
     }
     /**
      * The method to read a resource file with words into string array.
+     * @param n - length of word.
      * @return - string array of words from the resource file.
      */
     public static String[] readDefaultWords(int n) {
@@ -49,6 +50,12 @@ public class WordsReader {
         return words.toArray(new String[0]);
     }
 
+    /**
+     * The method to read a required file with words into string array.
+     * @param path - file path
+     * @param n - length of word.
+     * @return - string array of words from the required file.
+     */
     public static String[] readWordsFromFile(String path, int n) {
         ArrayList<String> words = new ArrayList<>();
         InputStream inputStream;
