@@ -1,6 +1,5 @@
 package ru.hse.server_gui;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import ru.hse.homework.server.Server;
 import ru.hse.homework.server.ServerBuilder;
 
@@ -134,7 +132,7 @@ public class ConfigController {
             field.setTextFormatter(textFormatter);
         }
 
-        Pattern wordPattern = Pattern.compile("[a-zа-яё]+");
+        Pattern wordPattern = Pattern.compile("[a-zа-яё]*");
         TextFormatter<String> wordFormatter = new TextFormatter<>(change -> {
             if (wordPattern.matcher(change.getControlNewText()).matches()) {
                 return change;
@@ -188,12 +186,9 @@ public class ConfigController {
      */
     @FXML
     protected void launchServer() {
-        wordField.getScene().getWindow().setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                if (isRunning) {
-                    server.shutDown();
-                }
+        wordField.getScene().getWindow().setOnCloseRequest(windowEvent -> {
+            if (isRunning) {
+                server.shutDown();
             }
         });
 

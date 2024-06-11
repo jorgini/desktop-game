@@ -189,7 +189,7 @@ public class ConnectionManager extends Thread {
                     out.writeUTF("You lose");
                 }
             } catch (IOException e) {
-                continue;
+                System.out.println("Cant send result:" + e.getMessage());
             }
         }
     }
@@ -217,7 +217,7 @@ public class ConnectionManager extends Thread {
                 out.writeInt(n);
                 out.writeInt(ts);
             } catch (IOException e) {
-                continue;
+                System.out.println("Cant send start game session: " + e.getMessage());
             }
         }
     }
@@ -309,13 +309,12 @@ public class ConnectionManager extends Thread {
     }
 
     /**
-     * Method to stop the connection manager and close all sockets with exit message.
+     * Method to stop the connection manager and close all sockets.
      */
     public synchronized void stopManager() {
         stop = true;
         for (Socket client : clients) {
-            try (DataOutputStream out = new DataOutputStream(client.getOutputStream())) {
-                out.writeUTF("Stop connection");
+            try {
                 client.close();
             } catch (IOException e) {
                 System.out.println("Can't close connection");

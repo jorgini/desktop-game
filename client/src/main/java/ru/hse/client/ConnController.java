@@ -1,6 +1,5 @@
 package ru.hse.client;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -10,11 +9,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -167,28 +164,17 @@ public class ConnController {
             switchLockFields(true);
             cancel.setVisible(true);
 
-            cancel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    gameController.cancel();
-                    cancelGame();
-                }
+            cancel.setOnMouseClicked(mouseEvent -> {
+                gameController.cancel();
+                cancelGame();
             });
 
-            gameStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent windowEvent) {
-                    showWindow();
-                    gameController.cancel();
-                }
+            gameStage.setOnCloseRequest(windowEvent -> {
+                showWindow();
+                gameController.cancel();
             });
 
-            gameStage.setOnShown(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent windowEvent) {
-                    hideWindow();
-                }
-            });
+            gameStage.setOnShown(windowEvent -> hideWindow());
         }
     }
 

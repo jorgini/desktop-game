@@ -1,7 +1,6 @@
 package ru.hse.client;
 
 import javafx.animation.AnimationTimer;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -18,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -248,7 +246,7 @@ public class GameController {
 
     /**
      * Prints list of players with their progress if game already start, otherwise - only usernames.
-     * @param players
+     * @param players list of players nicknames.
      */
     public void printListPlayers(List<String> players) {
         playersList.getChildren().clear();
@@ -284,7 +282,7 @@ public class GameController {
 
     /**
      * Updates game progress and prints list of players.
-     * @param progress
+     * @param progress list of strings aka "name - **+**".
      */
     public void printGameProgress(List<String> progress) {
         List<String> names = new ArrayList<>();
@@ -482,12 +480,9 @@ public class GameController {
         stage.initOwner(submitButton.getScene().getWindow());
         stage.show();
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                Stage gameWindow = (Stage) submitButton.getScene().getWindow();
-                gameWindow.getOnCloseRequest().handle(windowEvent);
-            }
+        stage.setOnCloseRequest(windowEvent -> {
+            Stage gameWindow = (Stage) submitButton.getScene().getWindow();
+            gameWindow.getOnCloseRequest().handle(windowEvent);
         });
     }
 

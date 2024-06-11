@@ -56,7 +56,7 @@ public class Server extends Thread {
     /**
      * File path to word base.
      */
-    private String pathWordBase = WordsReader.getResourceFilename();;
+    private String pathWordBase = WordsReader.getResourceFilename();
 
     /**
      * Array with all launched sessions.
@@ -126,7 +126,7 @@ public class Server extends Thread {
             System.out.println("Server successfully launched on port " + port);
             int session_id = 0;
 
-            while (true) {
+            while (ss.isOpen()) {
                 Session cur_session = new SessionBuilder()
                         .setId(++session_id)
                         .setTb(tb)
